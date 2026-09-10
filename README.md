@@ -7,4 +7,4 @@ A very very simple PyQt6 video downloader app that uses yt-dlp.
 * Live console ouput of `yt-dlp` downloading video
 * Options to enable embedding auto-generated english captions
 
-**Only for Linux for now**
+**System or user installation of `yt-dlp` is required for now**
