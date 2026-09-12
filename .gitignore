@@ -6,4 +6,4 @@ __pycache__/
 *.pyo
 *.pyd
 .*.kate-swp
-.kateconfig
+.swp.*
