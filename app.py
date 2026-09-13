@@ -1,7 +1,9 @@
 import sys
+import shutil
+import os
 import faulthandler
 faulthandler.enable()
-from PyQt6.QtCore import Qt, QProcess
+from PyQt6.QtCore import Qt, QProcess, QProcessEnvironment
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (
     QApplication,
@@ -49,12 +51,18 @@ class MainWindow(QMainWindow):
         fidget.setLayout(layout)
         self.setCentralWidget(fidget)
         self.process = QProcess(self)
+        env = QProcessEnvironment.systemEnvironment()
+        pathy = os.path.expanduser("~/.local/bin/") + ":" + env.value('PATH')
+        env.insert("PATH", pathy)
+        self.process.setProcessEnvironment(env)
         self.process.readyReadStandardOutput.connect(self.dod)
         self.process.finished.connect(self.donee)
+        self.installer()
     def dod(self):
         data = self.process.readAllStandardOutput().data().decode(errors='ignore')
         self.fodd(data)
     def fodd(self, text):
+        print(text)
         self.outputer.insertPlainText(text)
     def entereda(self):
         print("Return pressed!")
@@ -94,11 +102,20 @@ class MainWindow(QMainWindow):
     def donee(self, exitcodde, exit_status):
         if exit_status == QProcess.ExitStatus.NormalExit:
             if exitcodde == 0:
-                finga = QMessageBox.information(self, "Alert", "Done downloading video! Exited with exit code " + str(exitcodde))
+                finga = QMessageBox.information(self, "Simple YT Video Downloader", "Done downloading! Exited with exit code " + str(exitcodde))
+                os.chmod(os.path.expanduser("~/.local/bin/yt-dlp"), 0o775)
             else:
-                finga = QMessageBox.warning(self, "Alert", "Uh oh! Something went wrong. Exit code " + str(exitcodde))
+                finga = QMessageBox.warning(self, "Simple YT Video Downloader", "Uh oh! Something went wrong. Exit code " + str(exitcodde))
         else:
-            finga = QMessageBox.critical(self, "Alert", "Ahhh! Something went very very wrong!")
+            finga = QMessageBox.critical(self, "Simple YT Video Downloader", "Ahhh! Something went very very wrong!")
+    def installer(self):
+        if shutil.which("yt-dlp") is None:
+            installd = QMessageBox.question(self, "Warning", "yt-dlp was not found on your system. Select \"Yes\" if you want to install it in your ~/.local/bin directory.")
+            if installd == QMessageBox.StandardButton.Yes:
+                os.makedirs(os.path.expanduser("~/.local/bin"), exist_ok=True)
+                listee = ["-O", os.path.expanduser("~/.local/bin/yt-dlp"), "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux"]
+                print("wget", listee)
+                self.process.start("wget", listee)
 app = QApplication(sys.argv)
 app.setWindowIcon(QIcon("unnamed.png"))
 window = MainWindow()
