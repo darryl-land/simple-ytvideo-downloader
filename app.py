@@ -103,7 +103,8 @@ class MainWindow(QMainWindow):
         if exit_status == QProcess.ExitStatus.NormalExit:
             if exitcodde == 0:
                 finga = QMessageBox.information(self, "Simple YT Video Downloader", "Done downloading! Exited with exit code " + str(exitcodde))
-                os.chmod(os.path.expanduser("~/.local/bin/yt-dlp"), 0o775)
+                if os.path.exists(os.path.expanduser("~/.local/bin/yt-dlp")):
+                    os.chmod(os.path.expanduser("~/.local/bin/yt-dlp"), 0o775)
             else:
                 finga = QMessageBox.warning(self, "Simple YT Video Downloader", "Uh oh! Something went wrong. Exit code " + str(exitcodde))
         else:
