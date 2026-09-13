@@ -7,3 +7,4 @@ __pycache__/
 *.pyd
 .*.kate-swp
 .swp.*
+*.*.kate-swp
