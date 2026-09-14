@@ -136,7 +136,7 @@ class MainWindow(QMainWindow):
                 self.process.start("wget", listee)
 app = QApplication(sys.argv)
 app.setApplicationName("Simple YT Video Downloader")
-app.setApplicationVersion("1.1.1")
+app.setApplicationVersion("1.2.0")
 parser = QCommandLineParser()
 parser.addHelpOption()
 parser.addVersionOption()
