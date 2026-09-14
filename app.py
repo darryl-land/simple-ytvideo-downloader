@@ -1,9 +1,10 @@
 import sys
 import shutil
 import os
+import signal
 import faulthandler
 faulthandler.enable()
-from PyQt6.QtCore import Qt, QProcess, QProcessEnvironment
+from PyQt6.QtCore import Qt, QProcess, QProcessEnvironment, QCommandLineOption, QCommandLineParser, QTimer
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (
     QApplication,
@@ -19,10 +20,12 @@ from PyQt6.QtWidgets import (
     QTextEdit,
     QMessageBox,
 )
-
+os.environ["QT_LOGGING_RULES"] = "*.warning=false"
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
+        self.urla = marg
         self.setWindowTitle("Simple YT Video Downloader")
         self.widget = QLineEdit()
         self.widget.setPlaceholderText("Enter your YouTube video URL")
@@ -57,6 +60,7 @@ class MainWindow(QMainWindow):
         self.process.setProcessEnvironment(env)
         self.process.readyReadStandardOutput.connect(self.dod)
         self.process.finished.connect(self.donee)
+        self.clickedydo()
         self.installer()
     def dod(self):
         data = self.process.readAllStandardOutput().data().decode(errors='ignore')
@@ -99,6 +103,19 @@ class MainWindow(QMainWindow):
         thingyy = "stdbuf"
         print(thingyy, theresta)
         self.process.start(thingyy, theresta)
+    def clickedydo(self):
+        print(self.urla)
+        print(type(self.urla))
+        if self.process.state() == QProcess.ProcessState.Running:
+            return
+        if self.urla:
+            theresta = ["-oL", "-eL", "yt-dlp", "-P","~/Videos/"]
+            if self.process.state() == QProcess.ProcessState.Running:
+                return
+            theresta.extend(self.urla)
+            thingyy = "stdbuf"
+            print(thingyy, theresta)
+            self.process.start(thingyy, theresta)
     def donee(self, exitcodde, exit_status):
         if exit_status == QProcess.ExitStatus.NormalExit:
             if exitcodde == 0:
@@ -118,7 +135,17 @@ class MainWindow(QMainWindow):
                 print("wget", listee)
                 self.process.start("wget", listee)
 app = QApplication(sys.argv)
+app.setApplicationName("Simple YT Video Downloader")
+app.setApplicationVersion("1.2.0")
+parser = QCommandLineParser()
+parser.setApplicationDescription("Another very very very simple and easy to use PyQt6 video downloader app that uses yt-dlp")
+parser.addHelpOption()
+parser.addVersionOption()
+parser.addPositionalArgument("url", "URLs to download", "[URL]")
+parser.process(app)
 app.setWindowIcon(QIcon("unnamed.png"))
+global marg
+marg = parser.positionalArguments()
 window = MainWindow()
 window.show()
 app.exec()
