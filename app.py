@@ -4,7 +4,7 @@ import os
 import signal
 import faulthandler
 faulthandler.enable()
-from PyQt6.QtCore import Qt, QProcess, QProcessEnvironment, QCommandLineOption, QCommandLineParser, QTimer
+from PyQt6.QtCore import Qt, QProcess, QProcessEnvironment, QCommandLineOption, QCommandLineParser
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (
     QApplication,
@@ -41,6 +41,9 @@ class MainWindow(QMainWindow):
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(label)
         layout.addWidget(self.outputer)
+        self.baryy = QProgressBar()
+        self.baryy.setRange(0, 1000)
+        layout.addWidget(self.baryy)
         layoutb.addWidget(self.widget)
         self.button = QPushButton("Download", self)
         self.button.clicked.connect(self.clickedy)
@@ -63,9 +66,24 @@ class MainWindow(QMainWindow):
         self.clickedydo()
         self.installer()
     def dod(self):
-        data = self.process.readAllStandardOutput().data().decode(errors='ignore')
+        data = self.process.readAllStandardOutput().data().decode("utf-8", errors='ignore')
         self.fodd(data)
     def fodd(self, text):
+        self.baryy.setValue(0)
+        fink = text.replace("\r", "\n")
+        for line in fink.splitlines():
+            if "%" in line:
+                try:
+                    for word in line.split():
+                        if "%" in word:
+                            figad = word.replace("%", "").replace("[", "").replace("]", "")
+                            floatynum = float(figad)
+                            if 0.0 <= floatynum <= 100.0:
+                                self.baryy.setFormat(str(floatynum) + "%")
+                                self.baryy.setValue(int(floatynum * 10))
+                                break
+                except ValueError:
+                    pass
         print(text)
         self.outputer.insertPlainText(text)
     def entereda(self):
